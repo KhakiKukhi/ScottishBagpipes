@@ -95,7 +95,10 @@
             }
 
             .note {
-                padding: 0 1em;
+                padding: 0 0.75em;
+                margin: 0 0.25em;
+
+                background-color: #ff7a4b;
 
                 display: flex;
                 flex-direction: column;
@@ -112,7 +115,7 @@
             }
 
             .note.upcoming {
-                background: rgb(0 0 0 / 0.5);
+                background: rgb(0 0 0 / 0.2);
             }
 
 
@@ -217,6 +220,14 @@
 
             .song_select {
                 padding: 0.5em 1em;
+            }
+
+            .whitetext {
+                color: white;
+            }
+
+            .blacktext {
+                color: black;
             }
         </style>
     </head>
@@ -331,7 +342,7 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>A</p>
             </div>
 
@@ -342,8 +353,8 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
                 <p>B</p>
             </div>
 
@@ -353,8 +364,8 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>C#</p>
             </div>
@@ -364,9 +375,9 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
-                <p>◯</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>D</p>
             </div>
@@ -375,47 +386,47 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>E</p>
             </div>
 
             <div class="note">
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>F#</p>
             </div>
 
             <div class="note">
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>g</p>
             </div>
 
             <div class="note">
-                <p>◯</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>a</p>
             </div>
 
@@ -427,7 +438,12 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◐</p>
+                <svg width="13.781" height="21.5" viewBox="0 0 100 100" style="display: inline-block; vertical-align: middle;">
+                  <!-- Right Half (White Side) -->
+                  <path d="M 50,5 A 45,45 0 0,1 50,95 Z" fill="white" />
+                  <!-- Left Half (Black Side) -->
+                  <path d="M 50,95 A 45,45 0 0,1 50,5 Z" fill="black" />
+                </svg>
                 <p>G#</p>
             </div>
 
@@ -438,7 +454,7 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>b</p>
             </div>
@@ -449,27 +465,27 @@
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>C</p>
             </div>
 
             <div class="note">
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>F</p>
             </div>
 
             <div class="note">
                 <p>⬤</p>
-                <p>◯</p>
+                <p class="whitetext">⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
                 <p>⬤</p>
