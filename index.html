@@ -1,0 +1,1080 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            #countdown {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+
+                z-index: 2000;
+
+                padding: 0.3em 0.6em;
+
+                font-size: 5em;
+                font-weight: bold;
+
+                background: rgba(255, 255, 255, 0.65);
+                border-radius: 0.2em;
+
+                pointer-events: none;
+                display: none;
+            }
+
+            #header, .subheader {
+                padding: 0.1em;
+                text-align: center;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 0.5em;
+                padding: 0.5em;
+            }
+
+            .controls input[type="checkbox"] {
+                width: 0.8em;
+                height: 0.8em;
+            }
+
+            #sequenceInput {
+                width: 100%;
+                padding: 0.5em;
+            }
+
+            .sequence_options {
+                display: flex;
+                align-items: center;
+                gap: 0.6em;
+            }
+
+            .sequence_options label {
+                display: flex;
+                align-items: center;
+                gap: 0.3em;
+            }
+
+            #countdownInput,
+            #timeUnitInput,
+            #speedFactorInput,
+            #notePauseInput {
+                width: 5em;
+                padding: 0.15em 0.2em;
+                font-size: 0.85em;
+            }
+
+            .controls > input[type="text"] {
+                width: 30em;
+                padding: 0.5em;
+            }
+
+            .controls label {
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
+                font-size: 0.8em;
+            }
+
+            .controls button {
+                padding: 0.5em 1em;
+            }
+
+            .notes_container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .note {
+                padding: 0 1em;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .note > img {
+                transform: scaleY(-1);
+                height: 10em;
+            }
+
+            .note.highlight {
+                background: #FFFF00FF;
+            }
+
+            .note.upcoming {
+                background: rgb(0 0 0 / 0.5);
+            }
+
+
+
+
+            .modal {
+                position: fixed;
+                inset: 0;
+                z-index: 1000;
+
+                display: none;
+                align-items: center;
+                justify-content: center;
+
+                padding: 1em;
+
+                background: rgba(0, 0, 0, 0.45);
+            }
+
+            .modal.open {
+                display: flex;
+            }
+
+            .modal_content {
+                width: min(40em, 100%);
+                max-height: 80vh;
+                overflow-y: auto;
+
+                padding: 1em;
+
+                background: white;
+                border-radius: 0.5em;
+            }
+
+            .modal_header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                margin-bottom: 1em;
+            }
+
+            .modal_close {
+                padding: 0.2em 0.5em;
+
+                font-size: 1.5em;
+
+                border: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            .song {
+                border-top: 1px solid #ccc;
+            }
+
+            .song:last-child {
+                border-bottom: 1px solid #ccc;
+            }
+
+            .song_header {
+                width: 100%;
+
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                padding: 0.8em;
+
+                border: 0;
+                background: none;
+
+                font: inherit;
+                text-align: left;
+                cursor: pointer;
+            }
+
+            .song_header:hover {
+                background: #f2f2f2;
+            }
+
+            .song_body {
+                display: none;
+
+                padding: 0 0.8em 0.8em;
+            }
+
+            .song.open .song_body {
+                display: block;
+            }
+
+            .song_sequence {
+                margin-bottom: 0.8em;
+                padding: 0.7em;
+
+                white-space: pre-wrap;
+                font-family: monospace;
+
+                background: #f5f5f5;
+                border-radius: 0.3em;
+            }
+
+            .song_select {
+                padding: 0.5em 1em;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="countdown"></div>
+
+        <h2 id="header">Scottish Bagpipe Fingering</h2>
+
+        <div class="controls">
+            <textarea
+                    id="sequenceInput"
+                    type="text"
+                    placeholder="Sequence"
+                    value=""
+                ></textarea>
+
+                <label>
+                    Time unit (seconds):
+                        <input
+                            id="timeUnitInput"
+                            type="number"
+                            min="0"
+                            value="0.5"
+                        >
+                </label>
+
+                <label>
+                    Speed factor:
+                    <input
+                        id="speedFactorInput"
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        value="1"
+                    >
+                </label>
+
+                <label>
+                    Pause between notes (seconds):
+                    <input
+                        id="notePauseInput"
+                        type="number"
+                        min="0"
+                        step="0.05"
+                        value="0"
+                    >
+                </label>
+
+                <div class="sequence_options">
+                    <label>
+                        Countdown:
+                        <input
+                            id="countdownInput"
+                            type="number"
+                            min="0"
+                            value="3"
+                        >
+                    </label>
+
+                    <label>
+                        <input
+                            id="loopInput"
+                            type="checkbox"
+                        >
+                        Loop
+                    </label>
+                </div>
+
+            <div id="button_group">
+                <button onclick="
+                runSequence(
+                    document.getElementById('sequenceInput').value,
+                    Number(document.getElementById('timeUnitInput').value),
+                    Number(document.getElementById('speedFactorInput').value),
+                    Number(document.getElementById('notePauseInput').value),
+                    Number(document.getElementById('countdownInput').value),
+                    document.getElementById('loopInput').checked
+                );
+            ">
+                Play
+            </button>
+
+            <button onclick="stopNotes()">
+                Stop
+            </button>
+
+            <button id="songsButton" type="button">
+                Songs
+            </button>
+            </div>
+        </div>
+
+        <div class="notes_container">
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>G</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>A</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>◯</p>
+                <p>B</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>C#</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>◯</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>D</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>E</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>F#</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>g</p>
+            </div>
+
+            <div class="note">
+                <p>◯</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>a</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◐</p>
+                <p>G#</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>b</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>C</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>◯</p>
+                <p>F</p>
+            </div>
+
+            <div class="note">
+                <p>⬤</p>
+                <p>◯</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>⬤</p>
+                <p>g#</p>
+            </div>
+
+
+        </div>
+
+        <div id="songsModal" class="modal">
+            <div class="modal_content">
+                <div class="modal_header">
+                    <h3>Songs</h3>
+
+                    <button
+                        id="closeSongsButton"
+                        type="button"
+                        class="modal_close"
+                    >
+                        &times;
+                    </button>
+                </div>
+
+                <div id="songsAccordion"></div>
+            </div>
+        </div>
+
+        <script>
+            let sequenceController = null;
+            let activeRunId = 0;
+
+            function isActiveRun(runId) {
+                return runId === activeRunId;
+            }
+
+            function parseSequence(input) {
+                // Expand ABC-style repeat:
+                // |: ... :|  -> ... ...
+                input = expandRepeats(input);
+
+                const notes = [];
+
+                let i = 0;
+
+                while (i < input.length) {
+                    const char = input[i];
+
+                    // Ignore formatting / bar lines.
+                    if (
+                        /\s/.test(char) ||
+                        char === "|" ||
+                        char === ":"
+                    ) {
+                        i++;
+                        continue;
+                    }
+
+                    // Only A-G / a-g are notes.
+                    if (!/[A-Ga-g]/.test(char)) {
+                        i++;
+                        continue;
+                    }
+
+                    const octave = /[a-g]/.test(char) ? 2 : 1;
+                    let note = char;
+
+                    i++;
+
+                    // Include an optional sharp.
+                    if (input[i] === "#") {
+                        note += "#";
+                        i++;
+                    }
+
+                    // Default duration = one time unit.
+                    let duration = 1;
+
+                    // Optional numeric multiplier:
+                    // E2 = 2 units
+                    // D4 = 4 units
+                    let number = "";
+
+                    while (i < input.length && /[0-9]/.test(input[i])) {
+                        number += input[i];
+                        i++;
+                    }
+
+                    if (number) {
+                        duration *= Number(number);
+                    }
+
+                    notes.push({
+                        note,
+                        octave,
+                        duration
+                    });
+
+                    /*
+                     * ABC broken rhythm:
+                     *
+                     * G>A
+                     *
+                     * means:
+                     *
+                     * G = 1.5 units
+                     * A = 0.5 units
+                     *
+                     * We mark the ">" here and modify this note plus
+                     * the next parsed note below.
+                     */
+                    if (input[i] === ">") {
+                        notes[notes.length - 1].duration *= 1.5;
+                        notes[notes.length - 1].shortenNext = true;
+
+                        i++;
+                    }
+                }
+
+                // Apply the short half of ">" to the following note.
+                for (let i = 0; i < notes.length - 1; i++) {
+                    if (notes[i].shortenNext) {
+                        notes[i + 1].duration *= 0.5;
+                    }
+
+                    delete notes[i].shortenNext;
+                }
+
+                if (notes.length) {
+                    delete notes[notes.length - 1].shortenNext;
+                }
+
+                return notes;
+            }
+
+            function expandRepeats(input) {
+                /*
+                 * Handles:
+                 *
+                 * |: G>A BG | AG E2 :|
+                 *
+                 * as:
+                 *
+                 * G>A BG | AG E2
+                 * G>A BG | AG E2
+                 */
+
+                while (true) {
+                    const start = input.indexOf("|:");
+
+                    if (start === -1) {
+                        break;
+                    }
+
+                    const end = input.indexOf(":|", start + 2);
+
+                    if (end === -1) {
+                        // Unclosed repeat: just remove the marker.
+                        input =
+                            input.slice(0, start) +
+                            input.slice(start + 2);
+
+                        continue;
+                    }
+
+                    const repeatedPart = input.slice(
+                        start + 2,
+                        end
+                    );
+
+                    input =
+                        input.slice(0, start) +
+                        repeatedPart +
+                        " " +
+                        repeatedPart +
+                        input.slice(end + 2);
+                }
+
+                // Remove any leftover repeat symbols.
+                return input
+                    .replaceAll("|:", "")
+                    .replaceAll(":|", "");
+            }
+
+            function getNoteElement(note) {
+                if (!note) {
+                    return null;
+                }
+
+                return [...document.querySelectorAll(".note")]
+                    .find(element => {
+                        const labels = element.querySelectorAll("p");
+
+                        if (!labels.length) {
+                            return false;
+                        }
+
+                        const noteLabel =
+                            labels[labels.length - 1].textContent.trim();
+
+                        return noteLabel === note.note;
+                    }) ?? null;
+            }
+
+            function clearNoteClasses() {
+                document
+                    .querySelectorAll(".note")
+                    .forEach(note => {
+                        note.classList.remove(
+                            "highlight",
+                            "upcoming"
+                        );
+                    });
+            }
+
+            function showNotes(current, upcoming) {
+                clearNoteClasses();
+
+                const currentElement =
+                    getNoteElement(current);
+
+                const upcomingElement =
+                    getNoteElement(upcoming);
+
+                if (currentElement) {
+                    currentElement.classList.add(
+                        "highlight"
+                    );
+                }
+
+                if (
+                    upcomingElement &&
+                    upcomingElement !== currentElement
+                ) {
+                    upcomingElement.classList.add(
+                        "upcoming"
+                    );
+                }
+            }
+
+            function sleep(milliseconds, signal) {
+                return new Promise((resolve, reject) => {
+                    const timeout =
+                        setTimeout(resolve, milliseconds);
+
+                    signal.addEventListener(
+                        "abort",
+                        () => {
+                            clearTimeout(timeout);
+
+                            reject(
+                                new DOMException(
+                                    "Stopped",
+                                    "AbortError"
+                                )
+                            );
+                        },
+                        { once: true }
+                    );
+                });
+            }
+
+            async function runCountdown(seconds, signal, upcoming, runId) {
+                if (!isActiveRun(runId)) {
+                    return;
+                }
+
+                const countdown =
+                    document.getElementById("countdown");
+
+                clearNoteClasses();
+
+                const upcomingElement =
+                    getNoteElement(upcoming);
+
+                if (upcomingElement) {
+                    upcomingElement.classList.add("upcoming");
+                }
+
+                if (seconds <= 0) {
+                    return;
+                }
+
+                countdown.style.display = "block";
+
+                try {
+                    for (let i = seconds; i > 0; i--) {
+                        if (!isActiveRun(runId)) {
+                            return;
+                        }
+
+                        countdown.textContent = i;
+
+                        await sleep(1000, signal);
+                    }
+                } finally {
+                    // An older run must not hide a newer run's countdown.
+                    if (isActiveRun(runId)) {
+                        countdown.style.display = "none";
+                        countdown.textContent = "";
+                    }
+                }
+            }
+
+            async function runSequence(
+                input,
+                timeUnit,
+                speedFactor,
+                notePause,
+                countdownSeconds,
+                loop
+            ) {
+                // Invalidates + aborts the previous run.
+                stopNotes();
+
+                // This run now owns this ID.
+                const runId = activeRunId;
+
+                const sequence =
+                    parseSequence(input);
+
+                if (!sequence.length) {
+                    return;
+                }
+
+                if (
+                    !Number.isFinite(timeUnit) ||
+                    timeUnit <= 0 ||
+                    !Number.isFinite(speedFactor) ||
+                    speedFactor <= 0 ||
+                    !Number.isFinite(notePause) ||
+                    notePause < 0
+                ) {
+                    alert(
+                        "Time unit and speed factor must be greater than 0, " +
+                        "and note pause must be 0 or greater."
+                    );
+                    return;
+                }
+
+                const controller =
+                    new AbortController();
+
+                sequenceController = controller;
+
+                const signal =
+                    controller.signal;
+
+                try {
+                    do {
+                        if (!isActiveRun(runId)) {
+                            return;
+                        }
+
+                        await runCountdown(
+                            countdownSeconds,
+                            signal,
+                            sequence[0],
+                            runId
+                        );
+
+                        for (
+                            let i = 0;
+                            i < sequence.length;
+                            i++
+                        ) {
+                            if (!isActiveRun(runId)) {
+                                return;
+                            }
+
+                            const current =
+                                sequence[i];
+
+                            let upcoming =
+                                sequence[i + 1];
+
+                            if (!upcoming && loop) {
+                                upcoming =
+                                    sequence[0];
+                            }
+
+                            showNotes(
+                                current,
+                                upcoming
+                            );
+
+                            // Play / hold the current note.
+                            await sleep(
+                                (
+                                    current.duration *
+                                    timeUnit /
+                                    speedFactor
+                                ) * 1000,
+                                signal
+                            );
+
+                            // Training pause before the next note.
+                            if (
+                                notePause > 0 &&
+                                upcoming
+                            ) {
+                                showUpcomingOnly(
+                                    upcoming
+                                );
+
+                                await sleep(
+                                    notePause * 1000,
+                                    signal
+                                );
+                            }
+                        }
+                    } while (
+                        loop &&
+                        isActiveRun(runId)
+                    );
+                } catch (error) {
+                    if (error.name !== "AbortError") {
+                        throw error;
+                    }
+                } finally {
+                    // Critical: an old run cannot clean up a newer run.
+                    if (isActiveRun(runId)) {
+                        clearNoteClasses();
+
+                        const countdown =
+                            document.getElementById("countdown");
+
+                        countdown.style.display = "none";
+                        countdown.textContent = "";
+
+                        if (sequenceController === controller) {
+                            sequenceController = null;
+                        }
+                    }
+                }
+            }
+
+            function stopNotes() {
+                // Immediately makes every previous async run stale.
+                activeRunId++;
+
+                if (sequenceController) {
+                    sequenceController.abort();
+                    sequenceController = null;
+                }
+
+                clearNoteClasses();
+
+                const countdown =
+                    document.getElementById("countdown");
+
+                countdown.style.display = "none";
+                countdown.textContent = "";
+            }
+
+            function showUpcomingOnly(upcoming) {
+                clearNoteClasses();
+
+                const upcomingElement =
+                    getNoteElement(upcoming);
+
+                if (upcomingElement) {
+                    upcomingElement.classList.add(
+                        "upcoming"
+                    );
+                }
+            }
+        </script>
+
+        <script>
+            const songs = [
+                {
+                    name: "Ladder",
+                    sequence: "| G A B C# D E F# g a G# b C F g# |"
+                },
+            ];
+
+            function buildSongsAccordion() {
+                const accordion =
+                    document.getElementById("songsAccordion");
+
+                accordion.innerHTML = "";
+
+                songs.forEach(song => {
+                    const songElement =
+                        document.createElement("div");
+
+                    songElement.className = "song";
+
+                    const header =
+                        document.createElement("button");
+
+                    header.type = "button";
+                    header.className = "song_header";
+
+                    const title =
+                        document.createElement("span");
+
+                    title.textContent = song.name;
+
+                    const arrow =
+                        document.createElement("span");
+
+                    arrow.textContent = "\u25BC";
+
+                    header.append(title, arrow);
+
+                    const body =
+                        document.createElement("div");
+
+                    body.className = "song_body";
+
+                    const sequence =
+                        document.createElement("div");
+
+                    sequence.className = "song_sequence";
+                    sequence.textContent = song.sequence;
+
+                    const selectButton =
+                        document.createElement("button");
+
+                    selectButton.type = "button";
+                    selectButton.className = "song_select";
+                    selectButton.textContent = "Select";
+
+                    header.addEventListener("click", () => {
+                        const isOpen =
+                            songElement.classList.toggle("open");
+
+                        arrow.textContent = isOpen ? "\u25B2" : "\u25BC";
+                    });
+
+                    selectButton.addEventListener("click", () => {
+                        document.getElementById(
+                            "sequenceInput"
+                        ).value = song.sequence;
+
+                        closeSongsModal();
+                    });
+
+                    body.append(
+                        sequence,
+                        selectButton
+                    );
+
+                    songElement.append(
+                        header,
+                        body
+                    );
+
+                    accordion.appendChild(
+                        songElement
+                    );
+                });
+            }
+
+            function openSongsModal() {
+                document
+                    .getElementById("songsModal")
+                    .classList.add("open");
+            }
+
+            function closeSongsModal() {
+                document
+                    .getElementById("songsModal")
+                    .classList.remove("open");
+            }
+
+            document
+                .getElementById("songsButton")
+                .addEventListener(
+                    "click",
+                    openSongsModal
+                );
+
+            document
+                .getElementById("closeSongsButton")
+                .addEventListener(
+                    "click",
+                    closeSongsModal
+                );
+
+            document
+                .getElementById("songsModal")
+                .addEventListener("click", event => {
+                    if (
+                        event.target ===
+                        document.getElementById("songsModal")
+                    ) {
+                        closeSongsModal();
+                    }
+                });
+
+            document.addEventListener(
+                "keydown",
+                event => {
+                    if (event.key === "Escape") {
+                        closeSongsModal();
+                    }
+                }
+            );
+
+            buildSongsAccordion();
+        </script>
+    </body>
+</html>
